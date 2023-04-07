@@ -10,7 +10,6 @@ type Post = {
   id: string;
   createdAt: Date;
   updatedAt: Date;
-  title: string;
   content: string | null;
   published: boolean;
   authorId: string;
@@ -20,8 +19,6 @@ const filterUserForClient = (user: User) => {
   return {
     id: user.id,
     username: user.username,
-    firstName: user.firstName,
-    lastName: user.lastName,
     profileImageUrl: user.profileImageUrl,
   };
 };

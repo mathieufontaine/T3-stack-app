@@ -16,7 +16,7 @@ model User {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     email     String   @unique
-    name      String?
+    username  String   @unique
     posts     Post[]
 }
 
@@ -24,8 +24,7 @@ model Post {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    title     String
-    content   String?
+    content   String  @db.VarChar(255)
     published Boolean  @default(false)
     author    User     @relation(fields: [authorId], references: [id])
     authorId  String

@@ -26,18 +26,18 @@ const filterUserForClient = (user: User) => {
 export const postsRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    const posts: Post[] = await ctx.prisma.post.findMany({
+    const allPosts: Post[] = await ctx.prisma.post.findMany({
       take: 100,
       orderBy: { createdAt: "desc" },
     });
     const users = (
       await clerkClient.users.getUserList({
-        userId: posts.map((post) => post.authorId),
+        userId: allPosts.map((post) => post.authorId),
         limit: 100,
       })
     ).map(filterUserForClient);
 
-    return posts.map((post: Post) => {
+    const posts = allPosts.map((post: Post) => {
       const user = users.find((user) => user.id === post.authorId);
       if (!user) {
         throw new TRPCError({
@@ -50,5 +50,6 @@ export const postsRouter = createTRPCRouter({
         author: user,
       };
     });
+    return posts;
   }),
 });

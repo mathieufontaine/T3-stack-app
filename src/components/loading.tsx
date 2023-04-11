@@ -29,3 +29,4 @@ export const LoadingPage = (props: {size? : number}) => (
         <LoadingSpinner size={props.size || 32} />
     </div>
 );
+ 

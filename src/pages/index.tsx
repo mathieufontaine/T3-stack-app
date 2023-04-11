@@ -67,8 +67,8 @@ const PostView = (props: PostWithUser) => {
 };
 
 const Home: NextPage = () => {
-  const { data, isLoading: isPostsLoading } = api.posts.getAll.useQuery();
-
+  const { data: posts, isLoading: isPostsLoading } = api.posts.getAll.useQuery();
+  
   const { isSignedIn, user } = useUser();
 
   return (
@@ -91,15 +91,15 @@ const Home: NextPage = () => {
             {isSignedIn && <CreatePostWizard />}
           </div>
           {isSignedIn && isPostsLoading && <LoadingPage />}
-          {isSignedIn && !isPostsLoading && !data && <div> No posts found</div>}
-          {isSignedIn && !isPostsLoading && data && data?.length > 0 && (
+          {isSignedIn && !isPostsLoading && !posts && <div> No posts found</div>}
+          {isSignedIn && !isPostsLoading && posts && posts?.length > 0 && (
             <>
               <h1 className="p-4 text-center text-2xl font-bold">
                 Lasts Posts
               </h1>
               <div className="flex flex-col">
-                {data?.map((post) => (
-                  <PostView {...post} key={post.author?.id} />
+                {posts?.map((post) => (
+                  <PostView {...post} key={post.id} />
                 ))}
               </div>
             </>

@@ -6,11 +6,12 @@ import Head from "next/head";
 import { SignIn } from "@clerk/nextjs";
 import { SignInButton, SignOutButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
-import {  api } from "~/utils/api";
+import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import { LoadingPage } from "~/components/loading";
 
 const CreatePostWizard = () => {
   const { user } = useUser();
@@ -55,7 +56,7 @@ const PostView = (props: PostWithUser) => {
       />
       <div>
         <div className="flex gap-4">
-          <span className="font-bold"> @{author?.username}</span> 
+          <span className="font-bold"> @{author?.username}</span>
           <span className="text-gray-500"> - </span>
           <span className="text-gray-500"> {dayjs(createdAt).fromNow()}</span>
         </div>
@@ -66,17 +67,9 @@ const PostView = (props: PostWithUser) => {
 };
 
 const Home: NextPage = () => {
-  const { data, isLoading } = api.posts.getAll.useQuery();
+  const { data, isLoading: isPostsLoading } = api.posts.getAll.useQuery();
 
   const { isSignedIn, user } = useUser();
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!data) {
-    return <div>No data</div>;
-  }
 
   return (
     <>
@@ -88,21 +81,29 @@ const Home: NextPage = () => {
         <div className="flex w-full flex-col">
           <div className="flex w-full items-center justify-between border-b bg-white p-4 font-bold text-black ">
             <div>
-            <h2>T3 Social App</h2>
-            {!user && <SignInButton />}
-            <div className="text-red-500 text-sm font-light">
-            {!!user && <SignOutButton />}
-            </div>
-            <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
+              <h2>T3 Social App</h2>
+              {!user && <SignInButton />}
+              <div className="text-sm font-light text-red-500">
+                {!!user && <SignOutButton />}
+              </div>
+              <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
             </div>
             {isSignedIn && <CreatePostWizard />}
           </div>
-          <h1 className="p-4 text-center text-2xl font-bold">Lasts Posts</h1>
-          <div className="flex flex-col">
-            {data?.map((post) => (
-              <PostView {...post} key={post.author?.id} />
-            ))}
-          </div>
+          {isSignedIn && isPostsLoading && <LoadingPage />}
+          {isSignedIn && !isPostsLoading && !data && <div> No posts found</div>}
+          {isSignedIn && !isPostsLoading && data && data?.length > 0 && (
+            <>
+              <h1 className="p-4 text-center text-2xl font-bold">
+                Lasts Posts
+              </h1>
+              <div className="flex flex-col">
+                {data?.map((post) => (
+                  <PostView {...post} key={post.author?.id} />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </main>
     </>
